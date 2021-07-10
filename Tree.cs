@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Tree
+namespace XML_Editor
 {
     class Node 
     {
