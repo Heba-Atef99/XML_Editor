@@ -60,5 +60,3 @@ namespace XML_Editor
         }
     }
 
-
-}
