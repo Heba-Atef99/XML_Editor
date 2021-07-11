@@ -4,7 +4,7 @@ using System.Text;
 
 namespace XML_Editor
 {
-    class Node 
+    class Node
     {
         private string tagName;
         private string tagValue;
@@ -18,7 +18,7 @@ namespace XML_Editor
             this.depth = depth;
 
         }
-       
+
         public List<Node> getChildren()
         {
             return this.children;
@@ -36,11 +36,11 @@ namespace XML_Editor
             return this.depth;
         }
 
-       
 
-      
+
+
     }
-    
+
     class Tree
     {
         private Node root;
@@ -60,7 +60,3 @@ namespace XML_Editor
         }
     }
 
-    
-
-    
-}
