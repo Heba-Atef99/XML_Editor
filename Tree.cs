@@ -86,7 +86,7 @@ namespace XML_Editor
             return this.root;
         }
 
-        private void appendChild(StreamReader reader, Node parent)
+        private void insertFileAUX(StreamReader reader, Node parent)
         {
             char[] letter = new char[2];
             string data;
@@ -139,7 +139,7 @@ namespace XML_Editor
                     }
                     else
                     {
-                        appendChild(reader, child);
+                        insertFileAUX(reader, child);
                     }
                 }
 
@@ -156,7 +156,7 @@ namespace XML_Editor
             Node parent = new Node();
             root = parent;
             parent.setDepth(-1);
-            appendChild(reader, parent);
+            insertFileAUX(reader, parent);
         }
     }
 }
