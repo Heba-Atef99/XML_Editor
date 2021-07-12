@@ -56,19 +56,19 @@ namespace ConsoleApp14
             for (int loop = 0; loop < r.getDepth(); loop++)
             {
                 write("    ", false);
-                Console.Write("    ");
+                //Console.Write("    ");
             }
             if (r.getTagAttributes() == null)
             {
                 write("<" + r.getTagName() + ">", true);
 
-                Console.WriteLine("<" + r.getTagName() + ">");
+                //Console.WriteLine("<" + r.getTagName() + ">");
             }
             else
             {
                 write("<" + r.getTagName() +" "+r.getTagAttributes()+ ">", true);
 
-                Console.WriteLine("<" + r.getTagName() + " " + r.getTagAttributes() + ">");
+                //Console.WriteLine("<" + r.getTagName() + " " + r.getTagAttributes() + ">");
             }
             if (r.getTagValue() == null)
             { }
@@ -77,11 +77,11 @@ namespace ConsoleApp14
                 for (int loop = 0; loop < r.getDepth() + 1; loop++)
                 {
                     write("    ", false);
-                    Console.Write("    ");
+                  //  Console.Write("    ");
                 }
 
                 write(r.getTagValue(), true);
-                Console.WriteLine(r.getTagValue());
+                //Console.WriteLine(r.getTagValue());
             }
             if (r != null)
             {
@@ -96,7 +96,7 @@ namespace ConsoleApp14
                 write("</" + r.getTagName() + ">", true);
 
                 flag = false;
-                Console.WriteLine("</" + r.getTagName() + ">"); flag = false; return;
+                //Console.WriteLine("</" + r.getTagName() + ">"); flag = false; return;
 
             }
 
@@ -105,13 +105,13 @@ namespace ConsoleApp14
                 {
                     write("    ", false);
 
-                    Console.Write("    ");
+                  //  Console.Write("    ");
                 }
 
                 write("</" + r.getTagName() + ">", true);
 
 
-                Console.WriteLine("</" + r.getTagName() + ">");
+                //Console.WriteLine("</" + r.getTagName() + ">");
             
 
         }
