@@ -1,119 +1,136 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 
-namespace ConsoleApp12
+namespace ConsoleApp14
 {
+    public static class Global
+    {
+        public static int first = 0;
+    }
     class Program
     {
         const string filename = "xmll.txt";
-        public static void write(string s,bool add)
+        public static void write(string s, bool add)
         {
-            StreamWriter sw = new StreamWriter(filename,true);
-            if (add == true)
+            if (Global.first == 0)
             {
-                sw.WriteLine(s);
-                sw.Close();
+                StreamWriter sw = new StreamWriter(filename, false);
+                if (add == true)
+                {
+                    sw.WriteLine(s);
+                    sw.Close();
+                }
+                else
+                {
+                    sw.Write(s);
+                    sw.Close();
+                }
+                Global.first = 1;
             }
             else
             {
-                sw.Write(s);
-                sw.Close();
-            }  
-        }
+                StreamWriter sw = new StreamWriter(filename, true);
+                if (add == true)
+                {
+                    sw.WriteLine(s);
+                    sw.Close();
+                }
+                else
+                {
+                    sw.Write(s);
+                    sw.Close();
+                }
 
+            }
+        }
 
         public static void Formating(Node root)
         {
-            
-           
             bool flag = false;
             Node r = root;
             List<Node> children = new List<Node>();
             children = root.getChildren();
-            if(r==null)
-                return ;
+            if (r == null)
+                return;
             for (int loop = 0; loop < r.getDepth(); loop++)
             {
-                write("    ",false);
-                Console.Write("    ");   
+                write("    ", false);
+                Console.Write("    ");
             }
-
-            write("<" + r.getTagName() + ">",false);
-           
-             Console.Write( "<" + r.getTagName() + ">");
-            if (r.getTagValue() == "")
+            if (r.getTagAttributes() == null)
             {
-               write(r.getTagValue(),true);
-                Console.WriteLine(r.getTagValue());
-            }
+                write("<" + r.getTagName() + ">", true);
 
+                Console.WriteLine("<" + r.getTagName() + ">");
+            }
             else
             {
-                write(r.getTagValue(),false);
-               
-                flag = true;
-                   Console.Write(r.getTagValue()); flag = true;
+                write("<" + r.getTagName() +" "+r.getTagAttributes()+ ">", true);
+
+                Console.WriteLine("<" + r.getTagName() + " " + r.getTagAttributes() + ">");
+            }
+            if (r.getTagValue() == null)
+            { }
+            else
+            {
+                for (int loop = 0; loop < r.getDepth() + 1; loop++)
+                {
+                    write("    ", false);
+                    Console.Write("    ");
+                }
+
+                write(r.getTagValue(), true);
+                Console.WriteLine(r.getTagValue());
             }
             if (r != null)
             {
 
                 foreach (Node child in children)
                 {
-                     Formating(child);
+                    Formating(child);
                 }
             }
             if (flag == true)
             {
-                write("</" + r.getTagName() + ">",true);
-            
-                flag = false; 
-                Console.WriteLine("</" + r.getTagName() + ">");flag = false; return;
-                
-            }
-            
-            if (r.getChildren() == null)
-            {
-                write("</" + r.getTagName() + ">",true);
-            
+                write("</" + r.getTagName() + ">", true);
 
-                Console.WriteLine("</" + r.getTagName() + ">"); }
-            
-            else
-            {
+                flag = false;
+                Console.WriteLine("</" + r.getTagName() + ">"); flag = false; return;
+
+            }
+
                 for (int loop = 0; loop < r.getDepth(); loop++)
 
                 {
-                    write("    ",false);
-                  
-                    Console.Write("    "); }
-                
-                write("</" + r.getTagName() + ">",true);
+                    write("    ", false);
 
-                
-                 Console.WriteLine("</" + r.getTagName() + ">");
-            }
+                    Console.Write("    ");
+                }
+
+                write("</" + r.getTagName() + ">", true);
+
+
+                Console.WriteLine("</" + r.getTagName() + ">");
             
-        }
 
+        }
 
         static void Main(string[] args)
         {
             int i;
-            Node root = new Node("users", "", 0);
-            Node node1 = new Node("user", "", 1);
-            Node node2 = new Node("id", "1", 2);
-            Node node3 = new Node("name", "nana", 2);
-            Node node4 = new Node("posts", "", 2);
-            Node node5 = new Node("post", "11111111111111111111111111111111111111111", 3);
-            Node node6 = new Node("post", "22222222222", 3);
-            Node node7 = new Node("fllowers", "", 2);
-            Node node8 = new Node("fllower", "", 3);
-            Node node9 = new Node("id", "2", 4);
-            Node node10 = new Node("follower", "", 3);
-            Node node11 = new Node("id", "3", 4);
+            Node root = new Node("users", null,null, 0);
+            Node node1 = new Node("user", null,null, 1);
+            Node node2 = new Node("id", "1",null, 2);
+            Node node3 = new Node("name", "nana",null, 2);
+            Node node4 = new Node("posts", null,"attribute", 2);
+            Node node5 = new Node("post", "11111111111111111111111111111111111111111",null,3);
+            Node node6 = new Node("post", "22222222222",null, 3);
+            Node node7 = new Node("fllowers", null,null, 2);
+            Node node8 = new Node("fllower", null,null, 3);
+            Node node9 = new Node("id", "2",null, 4);
+            Node node10 = new Node("follower", null,null, 3);
+            Node node11 = new Node("id", "3",null, 4);
             Tree tree = new Tree(root);
             tree.addChild(node1, root);
             tree.addChild(node2, node1);
@@ -129,8 +146,6 @@ namespace ConsoleApp12
             Node r = root;
             int count = r.getChildren().Count;
             Formating(root);
-      
-
         }
     }
 
@@ -138,16 +153,25 @@ namespace ConsoleApp12
     {
         private string tagName;
         private string tagValue;
+        private string tagAttributes;
         private int depth;
         private List<Node> children;
 
-        public Node(string tagName, string tagValue, int depth)
+        public Node(string tagName, string tagValue, string tagAttributes, int depth)
         {
             this.tagName = tagName;
             this.tagValue = tagValue;
             this.depth = depth;
+            this.tagAttributes = tagAttributes;
             children = new List<Node>();
 
+        }
+        public Node()
+        {
+            tagName = null;
+            tagValue = null;
+            tagAttributes = null;
+            depth = 0;
         }
 
         public List<Node> getChildren()
@@ -167,6 +191,10 @@ namespace ConsoleApp12
             return this.depth;
         }
 
+        public string getTagAttributes()
+        {
+            return this.tagAttributes;
+        }
 
 
 
@@ -191,3 +219,4 @@ namespace ConsoleApp12
         }
     };
 }
+
