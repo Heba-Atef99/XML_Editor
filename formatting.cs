@@ -91,16 +91,10 @@ namespace ConsoleApp14
                     Formating(child);
                 }
             }
-            if (flag == true)
-            {
-                write("</" + r.getTagName() + ">", true);
-
-                flag = false;
-                //Console.WriteLine("</" + r.getTagName() + ">"); flag = false; return;
-
-            }
-
-                for (int loop = 0; loop < r.getDepth(); loop++)
+           if (r.getIsClosingTag())
+            { }
+               else {
+                   for (int loop = 0; loop < r.getDepth(); loop++)
 
                 {
                     write("    ", false);
@@ -112,7 +106,7 @@ namespace ConsoleApp14
 
 
                 //Console.WriteLine("</" + r.getTagName() + ">");
-            
+               }
 
         }
 
@@ -154,20 +148,22 @@ namespace ConsoleApp14
         private string tagName;
         private string tagValue;
         private string tagAttributes;
+         private bool isClosingTag;
         private int depth;
         private List<Node> children;
 
-        public Node(string tagName, string tagValue, string tagAttributes, int depth)
+         public Node(string tagName, string tagValue, string tagAttributes, bool isClosingTag, int depth)
         {
             this.tagName = tagName;
             this.tagValue = tagValue;
             this.depth = depth;
             this.tagAttributes = tagAttributes;
+              this.isClosingTag = isClosingTag;
             children = new List<Node>();
 
         }
         public Node()
-        {
+        {     isClosingTag = false;
             tagName = null;
             tagValue = null;
             tagAttributes = null;
@@ -185,6 +181,10 @@ namespace ConsoleApp14
         public string getTagValue()
         {
             return this.tagValue;
+        }
+        public bool getIsClosingTag()
+        {
+            return isClosingTag;
         }
         public int getDepth()
         {
