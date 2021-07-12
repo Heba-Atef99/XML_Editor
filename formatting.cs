@@ -112,19 +112,20 @@ namespace ConsoleApp14
 
         static void Main(string[] args)
         {
-            int i;
-            Node root = new Node("users", null,null, 0);
-            Node node1 = new Node("user", null,null, 1);
-            Node node2 = new Node("id", "1",null, 2);
-            Node node3 = new Node("name", "nana",null, 2);
-            Node node4 = new Node("posts", null,"attribute", 2);
-            Node node5 = new Node("post", "11111111111111111111111111111111111111111",null,3);
-            Node node6 = new Node("post", "22222222222",null, 3);
-            Node node7 = new Node("fllowers", null,null, 2);
-            Node node8 = new Node("fllower", null,null, 3);
-            Node node9 = new Node("id", "2",null, 4);
-            Node node10 = new Node("follower", null,null, 3);
-            Node node11 = new Node("id", "3",null, 4);
+            
+             int i;
+            Node root = new Node("users", null,null,false, 0);
+            Node node1 = new Node("user", null,null,false, 1);
+            Node node2 = new Node("id", "1",null,false, 2);
+            Node node3 = new Node("name", "nana",null,false, 2);
+            Node node4 = new Node("posts", null,"attribute",false, 2);
+            Node node5 = new Node("post", "11111111111111111111111111111111111111111",null,false,3);
+            Node node6 = new Node("post", "22222222222",null,false, 3);
+            Node node7 = new Node("fllowers", null,null,false, 2);
+            Node node8 = new Node("fllower", null,null,false, 3);
+            Node node9 = new Node("id", "2",null,false, 4);
+            Node node10 = new Node("follower", null,null,false, 3);
+            Node node11 = new Node("id", "3",null,false, 4);
             Tree tree = new Tree(root);
             tree.addChild(node1, root);
             tree.addChild(node2, node1);
