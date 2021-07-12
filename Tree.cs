@@ -11,46 +11,54 @@ namespace XML_Editor
         private string tagValue;
         private string tagAttributes;
         private int depth;
+        private bool isClosingTag;
         private List<Node> children = new List<Node>();
 
-        public Node(string tagName, string tagValue, string tagAttributes, int depth)
+        public Node(string tagName, string tagValue, string tagAttributes,bool isClosingTag, int depth)
         {
             this.tagName = tagName;
             this.tagValue = tagValue;
             this.depth = depth;
             this.tagAttributes = tagAttributes;
+            this.isClosingTag = isClosingTag;
         }
+
         public Node()
         {
             tagName = null;
             tagValue = null;
             tagAttributes = null;
+            isClosingTag = false;
             depth = 0;
         }
 
         public List<Node> getChildren()
         {
-            return this.children;
+            return children;
         }
 
         public string getTagName()
         {
-            return this.tagName;
+            return tagName;
         }
 
         public string getTagValue()
         {
-            return this.tagValue;
+            return tagValue;
         }
 
         public int getDepth()
         {
-            return this.depth;
+            return depth;
         }
 
         public string getTagAttributes()
         {
-            return this.tagAttributes;
+            return tagAttributes;
+        }
+        public bool getIsClosingTag()
+        {
+            return isClosingTag;
         }
 
         public void setTagName(string tn)
@@ -60,6 +68,10 @@ namespace XML_Editor
         public void setTagValue(string tv)
         {
             tagValue = tv;
+        }
+        public void setIsClosingTag(bool check)
+        {
+            isClosingTag = check;
         }
         public void setDepth(int d)
         {
@@ -90,22 +102,7 @@ namespace XML_Editor
             char letter = (char)reader.Read();
             while (letter == '\n' || letter == '\t') letter = (char)reader.Read();
             return letter;
-            //letters[1] = (char)reader.Read();
-            //while (letters[1] == '\n' || letters[1] == '\t') letters[1] = (char)reader.Read();
         }
-
-        private char skipSpaces2(StreamReader reader)
-        {
-            char letter = (char)reader.Peek();
-            while (reader.Peek() == (int)('\n') || reader.Peek() == (int)('\t') || reader.Peek() == (int)(' '))
-            {
-                letter = (char)reader.Read();
-            }
-            return letter;
-            //letters[1] = (char)reader.Read();
-            //while (letters[1] == '\n' || letters[1] == '\t') letters[1] = (char)reader.Read();
-        }
-
 
         public Node getTreeRoot()
         {
@@ -114,11 +111,9 @@ namespace XML_Editor
 
         private void insertFileAUX(StreamReader reader, Node parent)
         {
-            //char[] letter = new char[2];
             char letter;
             string data;
             string name;
-            //Node parent = new Node();
 
             while (reader.Peek() >= 0)
             {
@@ -133,30 +128,46 @@ namespace XML_Editor
                     if (Char.IsLetter(letter))
                     { 
                         //add new child to current parent and update child depth
-                        Node child = new Node(null, null, null, parent.getDepth() + 1);
-                        //child.setDepth(parent.getDepth() + 1);
+                        Node child = new Node(null, null, null, false, parent.getDepth() + 1);
                         parent.getChildren().Add(child);
 
                         //save the tagName in name
                         name = letter.ToString();
                         letter = (char)reader.Read();
+                        
                         while (letter != '>')
                         {
                             name += letter.ToString();
                             letter = (char)reader.Read();
 
                             //save attributes
-                            if(letter == ' ')
+                            if (letter == ' ')
                             {
-                                data = reader.Read().ToString();
+                                data = ((char)reader.Read()).ToString();
                                 letter = (char)reader.Read();
                                 while (letter != '>')
                                 {
                                     data += letter.ToString();
+
+                                    //check for self closing tag
+                                    if (letter == '/')
+                                    {
+                                        child.setIsClosingTag(true);
+                                        letter = (char)reader.Read();
+                                        return;
+                                    }
+
                                     letter = (char)reader.Read();
                                 }
 
                                 child.setTagAttributes(data);
+                            }
+                            
+                            //check for self closing tag
+                            if (letter == '/') {
+                                child.setIsClosingTag(true);
+                                letter = (char)reader.Read();
+                                return; 
                             }
                         }
 
@@ -181,11 +192,21 @@ namespace XML_Editor
                                 letter = (char)reader.Read();
                                 data += letter.ToString();
                             }
+
+                            //remove any /n from the end of the data before saving it 
+                            int index = data.Length;
+                            while (data[index - 1] == '\n' || data[index - 1] == ' ' || data[index - 1] == '\t')
+                            {
+                                data = data.Substring(0, index - 1);
+                                index = data.Length;
+                            }
                             //****save the data in node****
                             child.setTagValue(data);
+
                         }
                         else
                         {
+                            //this child also has children
                             insertFileAUX(reader, child);
                         }
                     }
@@ -196,13 +217,6 @@ namespace XML_Editor
                 {
                     return;
                 }
-
-                //else if (letter == '<')
-                //{
-                //    letter = skipSpaces(reader);
-                //    if(letter == '/') return;
-                //}
-
             }
         }
 
