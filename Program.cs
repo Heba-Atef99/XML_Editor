@@ -19,6 +19,8 @@ namespace XML_Editor
             //n = & root;
             Node node20 = new Node("user", null, 1);
             Node node21 = new Node("id", "5", 2);
+            Node node22 = new Node("user", null, 1);
+            Node node23 = new Node("id", "8", 2);
             Node node1 = new Node("user", null, 1);
             Node node2 = new Node("id", "1", 2);
             Node node3 = new Node("name", "nana", 2);
@@ -32,8 +34,10 @@ namespace XML_Editor
             Node node11 = new Node("id", "3", 4);
             Tree tree = new Tree(root);
             tree.addChild(node1, root);
-            //tree.addChild(node20, root);
-            //tree.addChild(node21, node20);
+            tree.addChild(node20, root);
+            tree.addChild(node21, node20);
+            //tree.addChild(node22, root);
+            //tree.addChild(node23, node22);
             tree.addChild(node2, node1);
             tree.addChild(node3, node1);
             tree.addChild(node4, node1);
@@ -51,10 +55,10 @@ namespace XML_Editor
             List<Node> children = new List<Node>();
             children = r.getChildren();
             count = children[0].getChildren().Count;
-            Console.WriteLine("{");
+            //Console.WriteLine("{");
             write("{", true);
             convert(root, root);
-            Console.WriteLine("}");
+            //Console.WriteLine("}");
             write("}", true);
         }
         public static void convert(Node root, Node parent)
@@ -71,7 +75,7 @@ namespace XML_Editor
                 {
                     for (int i = 0; i < r.getDepth() * 4 + 2; i++)
                     {
-                        Console.Write(" ");
+                        //Console.Write(" ");
                         write(" ", false);
                     }
 
@@ -81,13 +85,13 @@ namespace XML_Editor
                 {
                     for (int i = 0; i < r.getDepth() * 4; i++)
                     {
-                        Console.Write(" ");
+                       // Console.Write(" ");
                         write(" ", false);
 
                     }
 
                 }
-                Console.WriteLine('"' + r.getTagName() + '"' + ":" + "{");
+                //Console.WriteLine('"' + r.getTagName() + '"' + ":" + "{");
                 write('"' + r.getTagName() + '"' + ":" + "{", true);
             }
 
@@ -96,10 +100,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine('"' + r.getTagName() + '"' + ":" + '"' + r.getTagValue() + '"');
+               // Console.WriteLine('"' + r.getTagName() + '"' + ":" + '"' + r.getTagValue() + '"');
                 write('"' + r.getTagName() + '"' + ":" + '"' + r.getTagValue() + '"', true);
             }
 
@@ -108,12 +112,12 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
 
                 }
 
-                Console.WriteLine('"' + r.getTagName() + '"' + ":" + '"' + r.getTagValue() + '"' + ",");
+               // Console.WriteLine('"' + r.getTagName() + '"' + ":" + '"' + r.getTagValue() + '"' + ",");
                 write('"' + r.getTagName() + '"' + ":" + '"' + r.getTagValue() + '"' + ",", true);
             }
 
@@ -122,10 +126,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine('"' + r.getTagName() + '"' + ":" + "[");
+                //Console.WriteLine('"' + r.getTagName() + '"' + ":" + "[");
                 write('"' + r.getTagName() + '"' + ":" + "[", true);
             }
 
@@ -134,10 +138,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine('"' + r.getTagName() + '"' + ":" + "{");
+                //Console.WriteLine('"' + r.getTagName() + '"' + ":" + "{");
                 write('"' + r.getTagName() + '"' + ":" + "{", true);
                 flag = 0;
             }
@@ -147,10 +151,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4 + 2; i++)
                 {
-                    Console.Write(" ");
+                   //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine('"' + r.getTagValue() + '"');
+                //Console.WriteLine('"' + r.getTagValue() + '"');
                 write('"' + r.getTagValue() + '"', true);
             }
             if (r.getChildren().Count == 0
@@ -158,10 +162,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4 + 2; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine('"' + r.getTagValue() + '"' + ",");
+                //Console.WriteLine('"' + r.getTagValue() + '"' + ",");
                 write('"' + r.getTagValue() + '"' + ",", true);
             }
             if (r != null && ((r.getTagName() + "s") == parent.getTagName())
@@ -169,10 +173,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4 + 2; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine("{");
+                //Console.WriteLine("{");
                 write("{", true);
             }
             foreach (Node child in children)
@@ -184,10 +188,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4 + 4; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine("]");
+                //Console.WriteLine("]");
                 write("]", true);
             }
             if (r != null && r.getChildren().Count != 0
@@ -197,7 +201,7 @@ namespace XML_Editor
                 {
                     for (int i = 0; i < r.getDepth() * 4 + 2; i++)
                     {
-                        Console.Write(" ");
+                        //Console.Write(" ");
                         write(" ", false);
 
                     }
@@ -207,11 +211,11 @@ namespace XML_Editor
                 {
                     for (int i = 0; i < r.getDepth() * 4; i++)
                     {
-                        Console.Write(" ");
+                        //Console.Write(" ");
                         write(" ", false);
                     }
                 }
-                Console.WriteLine("}");
+                //Console.WriteLine("}");
                 write("}", true);
             }
             if (r != null && r.getChildren().Count != 0
@@ -219,10 +223,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine("},");
+                //Console.WriteLine("},");
                 write("},", true);
             }
             //follower
@@ -231,10 +235,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4 + 2; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine("}");
+                //Console.WriteLine("}");
                 write("}", true);
             }
             if (r != null && ((r.getTagName() + "s") == parent.getTagName())
@@ -243,10 +247,10 @@ namespace XML_Editor
             {
                 for (int i = 0; i < r.getDepth() * 4 + 2; i++)
                 {
-                    Console.Write(" ");
+                    //Console.Write(" ");
                     write(" ", false);
                 }
-                Console.WriteLine("},");
+                //Console.WriteLine("},");
                 write("},", true);
             }
 
