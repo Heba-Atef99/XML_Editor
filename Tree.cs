@@ -9,19 +9,22 @@ namespace XML_Editor
     {
         private string tagName;
         private string tagValue;
+        private string tagAttributes;
         private int depth;
         private List<Node> children = new List<Node>();
 
-        public Node(string tagName, string tagValue, int depth)
+        public Node(string tagName, string tagValue, string tagAttributes, int depth)
         {
             this.tagName = tagName;
             this.tagValue = tagValue;
             this.depth = depth;
+            this.tagAttributes = tagAttributes;
         }
         public Node()
         {
             tagName = null;
             tagValue = null;
+            tagAttributes = null;
             depth = 0;
         }
 
@@ -34,7 +37,7 @@ namespace XML_Editor
         {
             return this.tagName;
         }
-        
+
         public string getTagValue()
         {
             return this.tagValue;
@@ -43,6 +46,11 @@ namespace XML_Editor
         public int getDepth()
         {
             return this.depth;
+        }
+
+        public string getTagAttributes()
+        {
+            return this.tagAttributes;
         }
 
         public void setTagName(string tn)
@@ -58,6 +66,10 @@ namespace XML_Editor
             depth = d;
         }
 
+        public void setTagAttributes(string ta)
+        {
+            tagAttributes = ta;
+        }
     }
 
     class Tree
@@ -73,81 +85,124 @@ namespace XML_Editor
             root = null;
         }
 
-        private void readTwoletters(StreamReader reader, char[] letters)
+        private char skipSpaces(StreamReader reader)
         {
-            letters[0] = (char)reader.Read();
-            while(letters[0] == '\n' || letters[0] == '\t') letters[0] = (char)reader.Read();
-            letters[1] = (char)reader.Read();
-            while (letters[1] == '\n' || letters[1] == '\t') letters[1] = (char)reader.Read();
+            char letter = (char)reader.Read();
+            while (letter == '\n' || letter == '\t') letter = (char)reader.Read();
+            return letter;
+            //letters[1] = (char)reader.Read();
+            //while (letters[1] == '\n' || letters[1] == '\t') letters[1] = (char)reader.Read();
         }
+
+        private char skipSpaces2(StreamReader reader)
+        {
+            char letter = (char)reader.Peek();
+            while (reader.Peek() == (int)('\n') || reader.Peek() == (int)('\t') || reader.Peek() == (int)(' '))
+            {
+                letter = (char)reader.Read();
+            }
+            return letter;
+            //letters[1] = (char)reader.Read();
+            //while (letters[1] == '\n' || letters[1] == '\t') letters[1] = (char)reader.Read();
+        }
+
 
         public Node getTreeRoot()
         {
-            return this.root;
+            return this.root.getChildren()[0];
         }
 
         private void insertFileAUX(StreamReader reader, Node parent)
         {
-            char[] letter = new char[2];
+            //char[] letter = new char[2];
+            char letter;
             string data;
+            string name;
             //Node parent = new Node();
 
             while (reader.Peek() >= 0)
             {
-                //read two char.s from the file
-                readTwoletters(reader, letter);
+                //read one char skipping spaces & new lines
+                letter = skipSpaces(reader);
 
                 //check if we are reading an opening tag
-                if (letter[0] == '<' && letter[1] != '/')
+                if (letter == '<')
                 {
-                    Node child = new Node();
-                    child.setDepth(parent.getDepth() + 1);
-                    parent.getChildren().Add(child);
-                    data = letter[1].ToString();
-                    letter[1] = (char)reader.Read();
+                    letter = skipSpaces(reader);
 
-                    //save the tagName in data
-                    while (letter[1] != '>')
-                    {
-                        data += letter[1].ToString();
-                        letter[1] = (char)reader.Read();
-                    }
-                    //****save the tagname in node****
-                    child.setTagName(data);
+                    if (Char.IsLetter(letter))
+                    { 
+                        //add new child to current parent and update child depth
+                        Node child = new Node(null, null, null, parent.getDepth() + 1);
+                        //child.setDepth(parent.getDepth() + 1);
+                        parent.getChildren().Add(child);
 
-                    //data = ((char)reader.Peek()).ToString();
-                    while(reader.Peek() == (int)('\n') || reader.Peek() == (int)('\t'))
-                    {
-                        letter[1] = (char)reader.Read();
-                    }
-                    //save the data inside the tag if there is data
-                    if (reader.Peek() != (int)('<'))
-                    {
-                        letter[0] = (char)reader.Read();
-                        data = letter[0].ToString();
-
-                        letter[0] = (char)reader.Read();
-
-                        //save the data until reaching the closing tag
-                        while (letter[0] != '<')
+                        //save the tagName in name
+                        name = letter.ToString();
+                        letter = (char)reader.Read();
+                        while (letter != '>')
                         {
-                            data += letter[0].ToString();
-                            letter[0] = (char)reader.Read();
+                            name += letter.ToString();
+                            letter = (char)reader.Read();
+
+                            //save attributes
+                            if(letter == ' ')
+                            {
+                                data = reader.Read().ToString();
+                                letter = (char)reader.Read();
+                                while (letter != '>')
+                                {
+                                    data += letter.ToString();
+                                    letter = (char)reader.Read();
+                                }
+
+                                child.setTagAttributes(data);
+                            }
                         }
-                        //****save the data in node****
-                        child.setTagValue(data);
-                    }
-                    else
-                    {
-                        insertFileAUX(reader, child);
+
+                        //****save the tagname in node****
+                        child.setTagName(name);
+
+                        //skip spaces & new lines without consuming the letter
+                        while (reader.Peek() == (int)('\n') || reader.Peek() == (int)('\t') || reader.Peek() == (int)(' '))
+                        {
+                            letter = (char)reader.Read();
+                        }
+
+                        //save the data inside the tag if there is data
+                        if (reader.Peek() != (int)('<'))
+                        {
+                            letter = (char)reader.Read();
+                            data = letter.ToString();
+
+                            //save the data until reaching the closing tag
+                            while (reader.Peek() != (int)('<'))
+                            {
+                                letter = (char)reader.Read();
+                                data += letter.ToString();
+                            }
+                            //****save the data in node****
+                            child.setTagValue(data);
+                        }
+                        else
+                        {
+                            insertFileAUX(reader, child);
+                        }
                     }
                 }
 
                 //check if we are reading a closing tag
-                else if (letter[0] == '<' && letter[1] == '/')
+                else if (letter == '<' && reader.Peek() == (int)('/'))
                 {
                     return;
                 }
+
+                //else if (letter == '<')
+                //{
+                //    letter = skipSpaces(reader);
+                //    if(letter == '/') return;
+                //}
+
             }
         }
 
