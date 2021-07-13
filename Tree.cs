@@ -121,7 +121,7 @@ namespace XML_Editor
                 letter = skipSpaces(reader);
 
                 //check if we are reading an opening tag
-                if (letter == '<')
+                if (letter == '<' && reader.Peek() != (int)('/'))
                 {
                     letter = skipSpaces(reader);
 
@@ -143,19 +143,23 @@ namespace XML_Editor
                             //save attributes
                             if (letter == ' ')
                             {
+                                child.setTagName(name);
                                 data = ((char)reader.Read()).ToString();
                                 letter = (char)reader.Read();
                                 while (letter != '>')
                                 {
-                                    data += letter.ToString();
+                                    //data += letter.ToString();
 
                                     //check for self closing tag
-                                    if (letter == '/')
+                                    if (letter == '/' && reader.Peek() == (int)('>'))
                                     {
                                         child.setIsClosingTag(true);
+                                        child.setTagAttributes(data);
                                         letter = (char)reader.Read();
-                                        return;
+                                        //return;
+                                        continue;
                                     }
+                                    data += letter.ToString();
 
                                     letter = (char)reader.Read();
                                 }
@@ -164,10 +168,13 @@ namespace XML_Editor
                             }
                             
                             //check for self closing tag
-                            if (letter == '/') {
+                            if (letter == '/' && reader.Peek() == (int)('>')) {
                                 child.setIsClosingTag(true);
+                                //name += letter;
+                                child.setTagName(name);
                                 letter = (char)reader.Read();
-                                return; 
+                                //return; 
+                                continue;
                             }
                         }
 
@@ -204,18 +211,31 @@ namespace XML_Editor
                             child.setTagValue(data);
 
                         }
-                        else
+
+                        else if(child.getIsClosingTag() == false)
                         {
                             //this child also has children
                             insertFileAUX(reader, child);
                         }
+
                     }
                 }
 
-                //check if we are reading a closing tag
+                //check if we are reading a closing tag for that parent
                 else if (letter == '<' && reader.Peek() == (int)('/'))
                 {
-                    return;
+                    letter = (char)reader.Read();
+                    letter = (char)reader.Read();
+                    name = letter.ToString();
+                    letter = (char)reader.Read();
+                    while (letter != '>')
+                    {
+                        name += letter.ToString();
+                        letter = (char)reader.Read();
+                    }
+
+                    if(name == parent.getTagName())
+                        return;
                 }
             }
         }
