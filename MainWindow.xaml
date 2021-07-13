@@ -11,15 +11,15 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="convert" Content="Convert To JSON" Margin="0,499,27,0" VerticalAlignment="Top" FontSize="20" Height="40" Background="#FF94ED5C" HorizontalAlignment="Right" Width="182"/>
-        <Button x:Name="min" Content="Minify" Margin="83,499,0,0" VerticalAlignment="Top" FontSize="20" Height="40" Grid.Column="1" Background="#FF94ED5C" HorizontalAlignment="Left" Width="82"/>
+        <Button x:Name="convert" Content="Convert To JSON" Margin="0,499,27,0" VerticalAlignment="Top" FontSize="20" Height="40" Background="#FF94ED5C" HorizontalAlignment="Right" Width="182" Click="convert_Click"/>
+        <Button x:Name="min" Content="Minify" Margin="83,499,0,0" VerticalAlignment="Top" FontSize="20" Height="40" Grid.Column="1" Background="#FF94ED5C" HorizontalAlignment="Left" Width="82" Click="min_Click"/>
         <Button x:Name="compress" Content="Compress" HorizontalAlignment="Right" Margin="0,499,74,0" VerticalAlignment="Top" Width="113" FontSize="20" Height="40" Grid.Column="1" Background="#FF94ED5C"/>
         <Label Content="Choose an XML file:" HorizontalAlignment="Left" Margin="237,40,0,0" VerticalAlignment="Top" Width="223" Height="40" FontSize="24"/>
         <Label Content="Input" HorizontalAlignment="Left" Margin="226,101,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="37" Width="61"/>
         <Label Content="Output" HorizontalAlignment="Left" Margin="170,101,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.Column="1" Height="37" Width="77" RenderTransformOrigin="0.54,0.535"/>
         <TextBox x:Name="input_text" Margin="73,0,27,149" TextWrapping="Wrap" Height="288" VerticalAlignment="Bottom" Padding="5" IsReadOnly="True"/>
-        <TextBox x:Name="output_text" HorizontalAlignment="Left" Height="288" Margin="26,0,0,149" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="368" Grid.Column="1" Padding="5" IsReadOnly="True"/>
-        <Button x:Name="format" Content="Format" Margin="73,499,0,0" VerticalAlignment="Top" FontSize="20" Height="40" Background="#FF94ED5C" HorizontalAlignment="Left" Width="82"/>
+        <TextBox x:Name="output_text" Margin="26,143,74,149" TextWrapping="WrapWithOverflow" Grid.Column="1" Padding="5" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+        <Button x:Name="format" Content="Format" Margin="73,499,0,0" VerticalAlignment="Top" FontSize="20" Height="40" Background="#FF94ED5C" HorizontalAlignment="Left" Width="82" Click="format_Click"/>
         <Label x:Name="error_msg" Content="The input file has       errors as indicated by the red lines" HorizontalAlignment="Left" Margin="266,453,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="406" FontWeight="Bold" Background="#00DD6D6D" Foreground="#FFED3838" FontSize="15"/>
         <TextBox x:Name="num_errors" HorizontalAlignment="Left" Height="26" Margin="393,457,0,0" TextWrapping="Wrap" Text="3" VerticalAlignment="Top" Width="31" HorizontalContentAlignment="Center" Background="#00DD6D6D" BorderBrush="#00000000" FontWeight="Bold" Foreground="#FFED3838" FontSize="15" RenderTransformOrigin="0.523,0.752"/>
         <Button x:Name="browse" Content="Browse" Margin="56,40,0,0" VerticalAlignment="Top" FontSize="20" Height="40" Background="#FF94ED5C" HorizontalAlignment="Left" Width="82" Grid.Column="1" Click="browse_Click"/>
