@@ -47,7 +47,6 @@ namespace ConsoleApp14
 
         public static void Formating(Node root)
         {
-            bool flag = false;
             Node r = root;
             List<Node> children = new List<Node>();
             children = root.getChildren();
@@ -58,21 +57,32 @@ namespace ConsoleApp14
                 write("    ", false);
                 //Console.Write("    ");
             }
-            if (r.getTagAttributes() == null)
-            {
+            if (r.getTagAttributes() == null)//no attributes
+            {if (r.getIsClosingTag())
+             {
+                    write("<" + r.getTagName() + "/" + ">", true);
+            }
+             else 
+             {
                 write("<" + r.getTagName() + ">", true);
 
-                //Console.WriteLine("<" + r.getTagName() + ">");
+             }  //Console.WriteLine("<" + r.getTagName() + ">");
             }
             else
-            {
+            {if (r.getIsClosingTag())
+                {
+                    write("<" + r.getTagName() + " " + r.getTagAttributes() + "/" + ">", true);
+
+                    
+                }
+             else 
+             {
                 write("<" + r.getTagName() +" "+r.getTagAttributes()+ ">", true);
 
                 //Console.WriteLine("<" + r.getTagName() + " " + r.getTagAttributes() + ">");
-            }
-            if (r.getTagValue() == null)
-            { }
-            else
+            }}
+          
+              if (!(r.getTagValue() == null))
             {
                 for (int loop = 0; loop < r.getDepth() + 1; loop++)
                 {
@@ -91,9 +101,9 @@ namespace ConsoleApp14
                     Formating(child);
                 }
             }
-           if (r.getIsClosingTag())
-            { }
-               else {
+         
+           
+                if (!(r.getIsClosingTag())) {
                    for (int loop = 0; loop < r.getDepth(); loop++)
 
                 {
