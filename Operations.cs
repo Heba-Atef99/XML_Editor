@@ -11,14 +11,118 @@ namespace XML_Editor
     class Operations
     {
         public int first;
-        TextBox output;
         public string filename;
 
-        public Operations(TextBox output, string fname, int first)
+        public Operations(string fname, int first)
         {
             filename = fname;
-            this.output = output;
             this.first = first;
+        }
+
+        private void skipchars(StreamReader reader)
+        {
+            char letter = (char)reader.Read();
+            while (letter != '<')
+            {
+                letter = (char)reader.Read();
+            }
+        }
+
+        private char skipSpaces(StreamReader reader)
+        {
+            char letter = (char)reader.Read();
+            while (letter == '\n' || letter == '\t') letter = (char)reader.Read();
+            return letter;
+        }
+
+        private string readTagName(StreamReader reader)
+        {
+            char letter = (char)reader.Read();
+            
+            //eliminate comments & weird tags
+            if (char.IsLetter(letter))
+            {
+                string data = letter.ToString();
+
+                while (letter != '>' && reader.Peek() != (int)' ')
+                {
+                    data += letter.ToString();
+                    letter = (char)reader.Read();
+
+                    //if it is a self closing tag
+                    if (letter == '/') return null;
+                }
+                return data;
+            }
+            return null;
+        }
+
+        private string readTagAttributes(StreamReader reader)
+        {
+            char letter = (char)reader.Read();
+            string data = letter.ToString();
+
+            while (letter != '>')
+            {
+                data += letter.ToString();
+                letter = (char)reader.Read();
+
+                //if it is a self closing tag
+                if (letter == '/') return null;
+            }
+            return data;
+        }
+
+
+        public int Consistency(StreamReader reader)
+        {
+            //you will need to read from reader & write in filename 
+            //you need to write in filename after every read from reader
+            int errors_num = 0;
+            Stack<string> tags = new Stack<string>();
+            char characteres;
+            string tagName;
+            string tagAttributes;
+
+            //opening tag / closed tag
+
+            //read from the file char by char
+            while (reader.Peek() >= 0)
+            {
+                //read charachters until you reach <
+                characteres = skipSpaces(reader);
+                //skipchars(reader);
+                
+                //check if it is an opentag
+                if (reader.Peek() != (int)'/')
+                {
+                    //get the tagname
+                    tagName = readTagName(reader);
+
+                    if(reader.Peek() == (int)' ')
+                    {
+                        //means that there are attributes to be read
+                        characteres = (char)reader.Read();
+                        tagAttributes = readTagAttributes(reader);
+                    }
+                    //but check that it is not a selfclosing tag (dont push self closing tags in stack)
+                    if(tagName != null)
+                    {
+                        //push in stack
+                    }
+                }
+
+                //if it is a closing tag
+                else if(reader.Peek() == (int)'/')
+                {
+                    characteres = (char)reader.Read();
+                    //get the tag name of the closing tag
+                    tagName = readTagName(reader);
+
+                    //compare it with the top of stack
+                }
+            }
+            return errors_num;
         }
 
         public void write(string s, bool add)
@@ -54,62 +158,8 @@ namespace XML_Editor
             }
         }
 
-        /*public void Formating(Node root)
-        {
-            bool flag = false;
-            Node r = root;
-            List<Node> children = new List<Node>();
-            children = root.getChildren();
-            if (r == null)
-                return;
-            for (int loop = 0; loop < r.getDepth(); loop++)
-            {
-                write("    ", false);
-            }
-            if (r.getTagAttributes() == null)
-            {
-                write("<" + r.getTagName() + ">", true);
-            }
-            else
-            {
-                write("<" + r.getTagName() + " " + r.getTagAttributes() + ">", true);
-            }
-            if (r.getTagValue() == null)
-            { }
-            else
-            {
-                for (int loop = 0; loop < r.getDepth() + 1; loop++)
-                {
-                    write("    ", false);
-                }
-
-                write(r.getTagValue(), true);
-            }
-            if (r != null)
-            {
-
-                foreach (Node child in children)
-                {
-                    Formating(child);
-                }
-            }
-            if (flag == true)
-            {
-                write("</" + r.getTagName() + ">", true);
-                flag = false;
-            }
-
-            for (int loop = 0; loop < r.getDepth(); loop++)
-            {
-                write("    ", false);
-            }
-
-            write("</" + r.getTagName() + ">", true);
-        }*/
-
         public void Formating(Node root)
         {
-            bool flag = false;
             Node r = root;
             List<Node> children = new List<Node>();
             children = root.getChildren();
@@ -121,11 +171,19 @@ namespace XML_Editor
             }
             if (r.getTagAttributes() == null)
             {
-                write("<" + r.getTagName() + ">", true);
+                if (r.getIsClosingTag())
+                    write("<" + r.getTagName() + "/" + ">", true);
+                
+                else
+                    write("<" + r.getTagName() + ">", true);
             }
             else
             {
-                write("<" + r.getTagName() + " " + r.getTagAttributes() + ">", true);
+                if (r.getIsClosingTag())
+                    write("<" + r.getTagName() + " " + r.getTagAttributes() + "/" + ">", true);
+
+                else
+                    write("<" + r.getTagName() + " " + r.getTagAttributes() + ">", true);
             }
             
             if (r.getTagValue() != null)
@@ -156,56 +214,38 @@ namespace XML_Editor
         }
 
 
-
-        //public string MinifyingAUX(Node root)
-        //{
-        //    string xml = "";
-        //    Node r = root;
-        //    List<Node> children = root.getChildren();
-
-        //    if (r == null)
-        //        return "";
-
-        //    if (r.getTagAttributes() == null) { xml += "<" + r.getTagName() + ">"; }
-
-        //    else { xml += "<" + r.getTagName() + " " + r.getTagAttributes() + ">"; }
-
-        //    if (r.getTagValue() == null) { }
-
-        //    else
-        //    {
-        //        string newStr = r.getTagValue().Trim();
-
-        //        xml += newStr;
-        //    }
-
-        //    if (r != null)
-        //    {
-
-        //        foreach (Node child in children)
-        //        {
-        //            xml += MinifyingAUX(child);
-        //        }
-        //    }
-
-        //    xml += "</" + r.getTagName() + ">";
-        //    return xml;
-        //}
-
         public string MinifyingAUX(Node root)
         {
             string xml = "";
             Node r = root;
-            List<Node> children = root.getChildren();
+            List<Node> children = new List<Node>();
+            children = root.getChildren();
             if (r == null)
                 return "";
-            if (r.getTagAttributes() == null) { xml += "<" + r.getTagName() + ">"; }
-            else { xml += "<" + r.getTagName() + " " + r.getTagAttributes() + ">"; }
+            if (r.getTagAttributes() == null)
+            {
+                if (r.getIsClosingTag())
+                { xml += "<" + r.getTagName() + "/" + ">"; }
+
+                else
+                { xml += "<" + r.getTagName() + ">"; }
+            }
+            else
+            {
+                if (r.getIsClosingTag())
+                { xml += "<" + r.getTagName() + " " + r.getTagAttributes() + "/" + ">"; }
+
+                else
+                {
+                    xml += "<" + r.getTagName() + " " + r.getTagAttributes() + ">";
+                }
+            }
 
             if (r.getTagValue() == null) { }
             else
             {
                 string newStr = r.getTagValue().Trim();
+
                 xml += newStr;
             }
 
@@ -217,13 +257,12 @@ namespace XML_Editor
                     xml += MinifyingAUX(child);
                 }
             }
-            if (r.getIsClosingTag())
-            { }
-            else
+            if (!(r.getIsClosingTag()))
             {
                 xml += "</" + r.getTagName() + ">";
             }
             return xml;
+            
         }
 
         public void Minifying(Node root)

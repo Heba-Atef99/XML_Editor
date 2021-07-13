@@ -25,30 +25,24 @@ namespace XML_Editor
         public MainWindow()
         {
             InitializeComponent();
-            //using scroll bar in input textbox
-            input_text.AcceptsReturn = true;
-            input_text.TextWrapping = TextWrapping.NoWrap;
-            ScrollViewer.SetVerticalScrollBarVisibility(input_text, ScrollBarVisibility.Auto);
-            ScrollViewer.SetHorizontalScrollBarVisibility(input_text, ScrollBarVisibility.Auto);
-
-            //using scroll bar in output textbox
-            output_text.AcceptsReturn = true;
-            output_text.TextWrapping = TextWrapping.NoWrap;
-            ScrollViewer.SetVerticalScrollBarVisibility(output_text, ScrollBarVisibility.Auto);
-            ScrollViewer.SetHorizontalScrollBarVisibility(output_text, ScrollBarVisibility.Auto);
         }
 
         private void browse_Click(object sender, RoutedEventArgs e)
         {
+            success_msg.Visibility = Visibility.Hidden;
+            error_msg.Visibility = Visibility.Hidden;
+            num_errors.Visibility = Visibility.Hidden;
             OpenFileDialog input_file = new OpenFileDialog();
 
             //input_file.Filter = "txt files (*.txt)|*.txt";
             //input_file.Filter = "xml files (*.xml)|*.xml";
+
             input_file.FilterIndex = 2;
             input_file.RestoreDirectory = true;
 
             if (input_file.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                //remove any text writen before in output textbox when browsing new file
                 output_text.Text = null;
                 
                 //Get the path of specified file
@@ -65,58 +59,89 @@ namespace XML_Editor
                 {
                     var fileContent = reader.ReadToEnd();
                     input_text.Text = fileContent;
+                    //reader.Close();
+
+                    //call consistency 
+                    string c_file = "consistent_file.txt";
+                    Operations operation = new Operations(c_file, 0);
+                    int error_num = operation.Consistency(reader);
+                    if (error_num > 0)
+                    {
+                        error_msg.Visibility = Visibility.Visible;
+                        num_errors.Text = error_num.ToString();
+                    }
+
+                    using (StreamReader reader2 = new StreamReader(c_file))
+                    {
+                        t.insertFile(reader2);
+                        reader2.Close();
+                        if (File.Exists(c_file))
+                        {
+                            // If file found, delete it    
+                            File.Delete(c_file);
+                        }
+                    }
 
                     //read from the begginig of the file
-                    reader.DiscardBufferedData();
-                    reader.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
-                    
-                    t.insertFile(reader);
-                    reader.Close();
+                    //reader.DiscardBufferedData();
+                    //reader.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+
+                    //t.insertFile(reader);
+                    //reader.Close();
                 }
             }
-
         }
 
         private void format_Click(object sender, RoutedEventArgs e)
         {
-            output_text.Text = null;
+            //get the new file name you want
+            string destFileName = System.IO.Path.Combine(sourceDirectory, inputFileName + "_Output.xml");
 
-            string fname = inputFileName + "_Output.xml";
-            //get the new file name you want,the Combine method is strongly recommended
-            string destFileName = System.IO.Path.Combine(sourceDirectory, fname);
+            Operations operation = new Operations(destFileName, 0);
 
-            //Operations operation = new Operations(output_text, fname);
-            Operations operation = new Operations(output_text, destFileName, 0);
-            //if (File.Exists(destFileName))
-            //{
-            //    // If file found, delete it    
-            //    File.Delete(destFileName);
-            //}
-
+            //format the tree to look well indented
             operation.Formating(t.getTreeRoot());
+
+            //show the result in output textbox
             show_output(destFileName);
         }
 
         private void convert_Click(object sender, RoutedEventArgs e)
         {
-            output_text.Text = null;
+            //get the new file name you want
+            string destFileName = System.IO.Path.Combine(sourceDirectory, inputFileName + "_Output.json");
 
-            string fname = inputFileName + "_Output.json";
-            //get the new file name you want,the Combine method is strongly recommended
-            string destFileName = System.IO.Path.Combine(sourceDirectory, fname);
-
-            //Operations operation = new Operations(output_text, fname);
-            Operations operation = new Operations(output_text, destFileName, 0);
+            Operations operation = new Operations(destFileName, 0);
+            
+            //convert the tree to a json file
             operation.write("{", true);
             operation.Converting(t.getTreeRoot(), t.getTreeRoot());
             operation.write("}", true);
 
+            //show the result in output textbox
             show_output(destFileName);
         }
 
-        void show_output(string destFileName)
+
+        private void min_Click(object sender, RoutedEventArgs e)
         {
+            //get the new file name you want
+            string destFileName = System.IO.Path.Combine(sourceDirectory, inputFileName + "_min.xml");
+
+            Operations operation = new Operations(destFileName, 0);
+            
+            //minify the tree in one line
+            operation.Minifying(t.getTreeRoot());
+           
+            //show the result in output textbox
+            show_output(destFileName);
+        }
+
+        private void show_output(string destFileName)
+        {
+            //remove any text writen before in output textbox
             output_text.Text = null;
+
 
             using (StreamReader reader = new StreamReader(destFileName))
             {
@@ -124,21 +149,8 @@ namespace XML_Editor
                 output_text.Text = fileContent;
                 reader.Close();
             }
+
+            success_msg.Visibility = Visibility.Visible;
         }
-
-        private void min_Click(object sender, RoutedEventArgs e)
-        {
-            output_text.Text = null;
-
-            string fname = inputFileName + "_min.xml";
-            //get the new file name you want,the Combine method is strongly recommended
-            string destFileName = System.IO.Path.Combine(sourceDirectory, fname);
-
-            //Operations operation = new Operations(output_text, fname);
-            Operations operation = new Operations(output_text, destFileName, 0);
-            operation.Minifying(t.getTreeRoot());
-            show_output(destFileName);
-        }
-
     }
 }
