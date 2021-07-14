@@ -148,17 +148,15 @@ namespace XML_Editor
                                 letter = (char)reader.Read();
                                 while (letter != '>')
                                 {
-                                    //data += letter.ToString();
-
                                     //check for self closing tag
                                     if (letter == '/' && reader.Peek() == (int)('>'))
                                     {
                                         child.setIsClosingTag(true);
                                         child.setTagAttributes(data);
                                         letter = (char)reader.Read();
-                                        //return;
                                         continue;
                                     }
+
                                     data += letter.ToString();
 
                                     letter = (char)reader.Read();
@@ -170,10 +168,8 @@ namespace XML_Editor
                             //check for self closing tag
                             if (letter == '/' && reader.Peek() == (int)('>')) {
                                 child.setIsClosingTag(true);
-                                //name += letter;
                                 child.setTagName(name);
                                 letter = (char)reader.Read();
-                                //return; 
                                 continue;
                             }
                         }
