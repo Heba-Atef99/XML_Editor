@@ -4,157 +4,130 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using XML_Editor;
 
 namespace XML_Editor
 {
     class Program
     {
-        public static object FilleMode { get; private set; }
-
         static void Main(string[] args)
         {
+            string path1 = @"E:\DS project\C#\XML_Editor\test.txt";
 
-            //string s = "";
-            //string[] lines = File.ReadAllLines(path);
-            //foreach (string line in lines)
-            //{
-            //    byte[] arr = Encoding.ASCII.GetBytes(line);
-
-            //    //foreach(byte e in arr)
-            //    //{
-            //    //    Console.WriteLine((char)Convert.ToByte(Convert.ToString(e, 2),2));
-            //    //    s += Convert.ToString(e, 2);
-            //    //    Console.WriteLine(Convert.ToString(e, 2));
-
-            //    //}
-            //}
-
-            ////Console.WriteLine(s+"\n");
-            ////Console.WriteLine(s.Length+"\n");
-            string path = @"E:\DS project\C#\XML_Editor\test.txt";
-            string path2 = @"E:\DS project\C#\XML_Editor\test2.bin";
+            string path2 = @"E:\DS project\C#\XML_Editor\test2.txt";
             File.WriteAllText(path2, String.Empty);
+            string input = File.ReadAllText(path1);
+          
+            HuffmanTree huffmanTree = new HuffmanTree();
+            huffmanTree.Build(input);
 
-            string[] lines = File.ReadAllLines(path);
-            string text = "";
-            foreach (string line in lines)
-            {
-                text += line;
-            }
-            //File.WriteAllText(path2, text);
-           // string s = "WYS*WYGWYS*WYSWYSG";
-            List<short> outCode = new List<short>();
-            outCode = encoding(text);
-            //Console.WriteLine("Output Codes are: ");
-            string s = "";
-            for(int i = 0; i < outCode.Count; i++)
-            {
-                Console.WriteLine(outCode[i] + " " );
-                s += (short)outCode[i];
-                //BitArray b = new BitArray(new int[] { outCode[i] });
-                //byte[] bytes = new byte[b.Length / 8 + (b.Length % 8 == 0 ? 0 : 1)];
-                //b.CopyTo(bytes, 0);
-                //File.WriteAllBytes(path2, bytes);
-                //string binary = Convert.ToString(outCode[i], 2);
-                //byte [] arr =new byte[binary.Length]
-            }
-            var  arr = Encoding.ASCII.GetBytes(s);
-            BinaryWriter writer = new BinaryWriter(new FileStream(path2, FileMode.Create));
+            //encode
+            BitArray encoded = huffmanTree.Encode(input);
+            //Console.WriteLine("encoded length :"  + encoded.Length);
+            //Console.WriteLine("round number of bytes: " + Math.Ceiling((double)encoded.Length / 8));
 
-            writer.Write(arr);
-                //foreach(var b in arr)
-                //{
-                //    writer.Write(b);
-                //}
-                writer.Flush();
-                writer.Close();
+            //convert bits to bytes
+            byte[] bytes = new byte[(int)Math.Ceiling((double)encoded.Length / 8)];
+            encoded.CopyTo(bytes, 0);
+
+            //extra byte for bits which is not divisible by 8
+            int Addextra = 8 - ((encoded.Length) - ((encoded.Length / 8) * 8));
+            string binary = Addextra.ToString();
+           
+            //Console.WriteLine("extra bits at the end: "+binary);
+            byte[] add = Encoding.ASCII.GetBytes(binary);//1 byte
+           
+            //store symbols of the tree at the begining of the file with its number
+            string arr = "" ;
+            arr = huffmanTree.storeSymbol(huffmanTree.Root,arr);
+            //Console.WriteLine("symbols stored: " + arr + " Length: " + arr.Length);
+          
+            byte[] dict = Encoding.ASCII.GetBytes(arr);
+
+            byte[] arrLength = BitConverter.GetBytes((short)arr.Length);
+            //Console.WriteLine("dict: " + dict.Length);
+            //Console.WriteLine("bytes encoded: " + bytes.Length);
+            //Console.WriteLine("extra byte" + add.Length);
+
+            //store compressed bytes
+            BinaryWriter writer = new BinaryWriter(File.OpenWrite(path2));
+            writer.Write(arrLength);
+            writer.Write(dict);
+            writer.Write(bytes);
+            writer.Write(add);
+            writer.Flush();
+            writer.Close();
+
+
+            /*
+                    ------  DECODING -----
+             
+             */
+
+            //read compressed file to decompress
+            byte[] read = File.ReadAllBytes(path2);
+            //Console.WriteLine("size readed: " + read.Length);
+
+            //get back Huffman tree of the compressed file
+            byte[] firstBytes = { read[0],read[1]};
+            //Console.WriteLine(Encoding.ASCII.GetString(firstBytes));
+            //Console.WriteLine("first byte:" + read[0]);
+            short TreeSize = BitConverter.ToInt16(firstBytes,0);
+            //Console.WriteLine("Tree size: " + TreeSize);
+
             
-            Console.WriteLine("\n");
-            File.WriteAllText(path2, s);
-            decoding(outCode);
-            Console.WriteLine(outCode.Count);
-            Console.WriteLine(text.Length);
+            string TreeNodes = "";
+            firstBytes = new byte[TreeSize];
+            for (int i = 0; i < TreeSize; i++)
+            {
+                firstBytes[i] = read[2+i];
+            }
+            
+            TreeNodes = Encoding.ASCII.GetString(firstBytes);
+            //Console.WriteLine("TreeNodes:" + TreeNodes);
+
+            byte[] cut = new byte[read.Length - (TreeSize + 2)];
+            for (int i = 0; i < cut.Length; i++)
+            {
+                cut[i] = read[i + TreeSize + 2];
+            }
+        
+            
+            /*Construct Tree*/
+            HuffmanTree huffmanTree1 = new HuffmanTree();
+
+            huffmanTree1.Root = huffmanTree1.PreOrderBuild(TreeNodes);
+
+            //get the last byte
+            byte[] b = { cut[cut.Length - 1] };
+            int getBack = 8 + Convert.ToInt32(Encoding.ASCII.GetString(b));
+
+            var e = new BitArray(cut);
+            string s = "";
+            BitArray f = new BitArray(e.Length - getBack);
+            for (var i = 0; i < e.Length - getBack; i++)
+            {
+                f[i] = e[i];
+            }
+
+            for (var i = 0; i < f.Length; i++)
+            {
+                s += (f[i] ? 1 : 0);
+
+            }
+       
+            string decoded = huffmanTree1.Decode(f);
+            
+            string pathD = @"E:\DS project\C#\XML_Editor\decoded.txt";
+            StreamWriter sw = File.CreateText(pathD);
+            sw.Write(decoded);
+            sw.Flush();
+            sw.Close();
+            Console.WriteLine("Decoded: " + decoded);
+            if (input == decoded)
+                Console.WriteLine("TRUE");
         }
 
-        public static List<short> encoding(string file)
-        {
-
-            //Console.WriteLine("Encoding:\n");
-            Dictionary<string, short> table = new Dictionary<string, short>();
-            //prepare a table of ASCII codes for all  characters
-            for(short i = 0; i <=255; i++)
-            {
-                string key = "";
-                key += (char) i;
-                table.Add(key, i);
-            }
-
-            string first = "", second = "";
-            first += file[0];
-            short code = 256;
-            List<short> outCode = new List<short>();
-           // Console.WriteLine("String\tOutput_Code\tAddition\n");
-            for(int j = 0; j < file.Length; j++)
-            {
-                if(j != file.Length - 1)
-                {
-                    second += file[j + 1];
-                }
-                if (table.ContainsKey(first + second))
-                {
-                    first += second;
-                }
-                else
-                {
-                    //Console.WriteLine(first + "\t" + table[first] + "\t\t" + 
-                        //first+second + "\t" + code + "\n");
-                    outCode.Add(table[first]);
-                    table.Add(first + second, code);
-                    code++;
-                    first = second;
-                }
-                second = "";
-            }
-            //Console.WriteLine(first + "\t" + table[first] + "\n");
-            outCode.Add(table[first]);
-            return outCode;
-        }
-
-        public static void decoding(List<short> outCode) 
-        {
-            //Console.WriteLine("Decoding: ");
-            Dictionary<short, string> table = new Dictionary<short, string>();
-            for(short i = 0; i <=255; i++)
-            {
-                string val = "";
-                val += (char)i;
-                table.Add(i, val);
-            }
-            short old = outCode[0], n;
-            string str1 = table[old];
-            string str2 = "";
-            str2 += str1[0];
-            //Console.WriteLine(str1);
-            short count = 256;
-            for(int i = 0; i < outCode.Count - 1; i++)
-            {
-                n = outCode[i + 1];
-                if (!table.ContainsKey(n))
-                {
-                    str1 = table[old];
-                    str1 += str2;
-                }
-                else
-                {
-                    str1 = table[n];
-                }
-               // Console.WriteLine(str1);
-                str2 = "";
-                str2 += str1[0];
-                table[count] = table[old] + str2;
-                count++;
-                old = n;
-            }
-        }
+      
     }
 }
