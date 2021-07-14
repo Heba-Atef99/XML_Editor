@@ -22,106 +22,196 @@ namespace XML_Editor
         private void skipchars(StreamReader reader)
         {
             char letter = (char)reader.Read();
+
             while (letter != '<')
             {
+                write(letter.ToString(), false);
                 letter = (char)reader.Read();
             }
         }
 
         private char skipSpaces(StreamReader reader)
         {
-            char letter = (char)reader.Read();
-            while (letter == '\n' || letter == '\t') letter = (char)reader.Read();
-            return letter;
-        }
-
-        private string readTagName(StreamReader reader)
-        {
-            char letter = (char)reader.Read();
-            
-            //eliminate comments & weird tags
-            if (char.IsLetter(letter))
+            char letter;
+            while (reader.Peek() == (int)'\n' || reader.Peek() == (int)'\t' || reader.Peek() == (int)' ')
             {
-                string data = letter.ToString();
-
-                while (letter != '>' && reader.Peek() != (int)' ')
-                {
-                    data += letter.ToString();
-                    letter = (char)reader.Read();
-
-                    //if it is a self closing tag
-                    if (letter == '/') return null;
-                }
-                return data;
+                letter = (char)reader.Read();
             }
-            return null;
+            return (char)reader.Peek();
         }
 
-        private string readTagAttributes(StreamReader reader)
+        private List<string> readTagData(StreamReader reader)
         {
             char letter = (char)reader.Read();
-            string data = letter.ToString();
+            List<string> data_letter = new List<string>();
+            data_letter.Add(null);
+            data_letter.Add(letter.ToString());
+            data_letter.Add(null);
 
+            string data = "";
+
+            //<frame/>
             while (letter != '>')
             {
                 data += letter.ToString();
                 letter = (char)reader.Read();
 
-                //if it is a self closing tag
-                if (letter == '/') return null;
+                //if there are attributes
+                if (letter == ' ')
+                {
+                    string attr = "";
+                    while(letter != '>')
+                    {
+                        attr += letter;
+                        letter = (char)reader.Read();
+
+                        if (letter == '/' && reader.Peek() == (int)'>')
+                        {
+                            break;
+                        }
+
+                    }
+                    data_letter[2] = attr;
+                }
+                
+                if (letter == '/' && reader.Peek() == (int)'>')
+                {
+                    break;
+                }
             }
-            return data;
+            data_letter[0] = (data == "") ? null : data;
+            data_letter[1] = letter.ToString();
+            return data_letter;
         }
 
+        private bool hasData(StreamReader reader)
+        {
+            char characteres = skipSpaces(reader);//read '<'
+            if (characteres != '<' && characteres != '\0' && characteres != '>')
+            {
+                return true;//has value
+            }
+            return false;
+        }
 
         public int Consistency(StreamReader reader)
         {
-            //you will need to read from reader & write in filename 
-            //you need to write in filename after every read from reader
             int errors_num = 0;
             Stack<string> tags = new Stack<string>();
             char characteres;
-            string tagName;
-            string tagAttributes;
-
-            //opening tag / closed tag
+            string tagName = null;
+            string tagAttributes = null;
+            bool prevHadData = false;//to know if the saved tag name has value or not
+            bool currentHasData = false;//to know if the saved tag name has value or not
+            List<string> data_letter = new List<string>();
 
             //read from the file char by char
             while (reader.Peek() >= 0)
             {
                 //read charachters until you reach <
-                characteres = skipSpaces(reader);
-                //skipchars(reader);
-                
-                //check if it is an opentag
-                if (reader.Peek() != (int)'/')
-                {
-                    //get the tagname
-                    tagName = readTagName(reader);
+                skipchars(reader);
 
-                    if(reader.Peek() == (int)' ')
-                    {
-                        //means that there are attributes to be read
-                        characteres = (char)reader.Read();
-                        tagAttributes = readTagAttributes(reader);
-                    }
+                //check if it is an opening tag
+                if (Char.IsLetter((char)reader.Peek()))
+                {                    
+                    //get the tagname
+                    data_letter = readTagData(reader);
+                    tagName = data_letter[0];
+
+                    //get tag attributes
+                    tagAttributes = data_letter[2];
+
                     //but check that it is not a selfclosing tag (dont push self closing tags in stack)
-                    if(tagName != null)
+                    if (data_letter[1] != "/" && tagName != null)
                     {
-                        //push in stack
+                        //read tag data 
+                        currentHasData = hasData(reader);
+
+                        //if it is the first opening tag then push it in stack
+                        if (tags.Count == 0)
+                        {
+                            tags.Push(tagName);
+                            write("<" + tagName + tagAttributes + ">", false);
+                        }
+
+                        //if closing tag is opened !!
+                        else if (tagName == tags.Peek() && prevHadData)
+                        {
+                            //check if current tag has data or not
+                            write("</" + tags.Peek() + ">", true);
+                            tags.Pop();
+                            if (currentHasData)
+                            {
+                                tags.Push(tagName);
+                                write("<" + tagName + tagAttributes + ">", false);
+                            }
+                            errors_num++;
+                        }
+
+                        else
+                        {
+                            //normal case with no errors
+                            tags.Push(tagName);
+                            write("<" + tagName + tagAttributes + ">", false);
+                        }
                     }
+                    else if (data_letter[1] == "/")
+                    {
+                        //selfclosing tag
+                        write("<" + tagName + tagAttributes + "/>", false);
+                        characteres = (char)reader.Read();
+                    }
+                    else
+                    {
+                        write("<" + data_letter[1], false);
+                    }
+
+                    prevHadData = currentHasData;
                 }
 
                 //if it is a closing tag
-                else if(reader.Peek() == (int)'/')
+                else if (reader.Peek() == (int)'/')
                 {
                     characteres = (char)reader.Read();
-                    //get the tag name of the closing tag
-                    tagName = readTagName(reader);
 
+                    //get the tag name of the closing tag
+                    tagName = readTagData(reader)[0];
+
+                    //if matching 
                     //compare it with the top of stack
+                    if (tags.Count > 0 && tags.Peek() == tagName)
+                    {
+                        write("</" + tagName + ">", false);
+                        tags.Pop();
+                    }
+
+                    else if(tags.Count > 0)
+                    {
+                        errors_num += 1;
+                        write("</" + tags.Peek() + ">", false);
+                        tags.Pop();
+                    }
+                }
+
+                //if it is a comment or anything else , skip it
+                else
+                {
+                    characteres = (char)reader.Read();
+                    while (characteres != '>')
+                    {
+                        characteres = (char)reader.Read();
+                    }
                 }
             }
+
+            //if file is finished and stack not empty
+            while (tags.Count != 0)
+            {
+                errors_num++;
+                write("</" + tags.Peek() + ">", false);
+                tags.Pop();
+            }
+
             return errors_num;
         }
 

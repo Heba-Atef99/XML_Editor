@@ -36,6 +36,7 @@ namespace XML_Editor
 
             //input_file.Filter = "txt files (*.txt)|*.txt";
             //input_file.Filter = "xml files (*.xml)|*.xml";
+            //openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
 
             input_file.FilterIndex = 2;
             input_file.RestoreDirectory = true;
@@ -61,6 +62,10 @@ namespace XML_Editor
                     input_text.Text = fileContent;
                     //reader.Close();
 
+                    //read from the begginig of the file
+                    reader.DiscardBufferedData();
+                    reader.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+
                     //call consistency 
                     string c_file = "consistent_file.txt";
                     Operations operation = new Operations(c_file, 0);
@@ -68,19 +73,23 @@ namespace XML_Editor
                     if (error_num > 0)
                     {
                         error_msg.Visibility = Visibility.Visible;
+                        num_errors.Visibility = Visibility.Visible;
                         num_errors.Text = error_num.ToString();
                     }
+                    show_output(c_file);
 
-                    using (StreamReader reader2 = new StreamReader(c_file))
-                    {
-                        t.insertFile(reader2);
-                        reader2.Close();
-                        if (File.Exists(c_file))
-                        {
-                            // If file found, delete it    
-                            File.Delete(c_file);
-                        }
-                    }
+                    //using (StreamReader reader2 = new StreamReader(c_file))
+                    //{
+                    //    //t.insertFile(reader2);
+                    //    //reader2.Close();
+                    //    //show_output(c_file);
+
+                    //    //if (File.Exists(c_file))
+                    //    //{
+                    //    //    // If file found, delete it    
+                    //    //    File.Delete(c_file);
+                    //    //}
+                    //}
 
                     //read from the begginig of the file
                     //reader.DiscardBufferedData();
