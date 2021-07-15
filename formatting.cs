@@ -17,10 +17,10 @@ namespace XML_Editor
             filename = fname;
             this.first = first;
         }
-
+//function used for writing in output file
         public void write(string s, bool add)
         {
-            if (first == 0)
+            if (first == 0)//if this is the first write after submitting formatting button  
             {
                 StreamWriter sw = new StreamWriter(filename, false);
                 if (add == true)
@@ -35,6 +35,7 @@ namespace XML_Editor
                 }
                 first = 1;
             }
+            //if this is not  the first write after submitting formatting button 
             else
             {
                 StreamWriter sw = new StreamWriter(filename, true);
