@@ -64,7 +64,7 @@ namespace XML_Editor
 
                 //Read the contents of the file into a stream
                 var fileStream = input_file.OpenFile();
-
+                int error_num = 0;
                 using (StreamReader reader = new StreamReader(fileStream))
                 {
                     var fileContent = reader.ReadToEnd();
@@ -78,12 +78,13 @@ namespace XML_Editor
                     c_file = "consistent_file.txt";
                     last_output = c_file;
                     Consistency operation = new Consistency(c_file, 0);
-                    int error_num = operation.Consistent(reader);
+                    error_num = operation.Consistent(reader);
                     if (error_num > 0)
                     {
                         error_msg.Visibility = Visibility.Visible;
                         num_errors.Visibility = Visibility.Visible;
                         num_errors.Text = error_num.ToString();
+                        show_output(c_file, false);
                     }
                     reader.Close();
                 }
@@ -109,7 +110,7 @@ namespace XML_Editor
                 operation.Format(t.getTreeRoot());
 
                 //show the result in output textbox
-                show_output(destFileName);
+                show_output(destFileName, true);
             }
         }
 
@@ -128,7 +129,7 @@ namespace XML_Editor
                 operation.write("}", true);
 
                 //show the result in output textbox
-                show_output(destFileName);
+                show_output(destFileName, true);
             }
         }
 
@@ -146,7 +147,7 @@ namespace XML_Editor
                 operation.Minify(t.getTreeRoot());
 
                 //show the result in output textbox
-                show_output(destFileName);
+                show_output(destFileName, true);
             }
         }
 
@@ -161,7 +162,7 @@ namespace XML_Editor
 
                 Compressing comp = new Compressing(last_output, destFileName);
                 comp.encoding();
-                show_output(destFileName);
+                show_output(destFileName, true);
             }
         }
 
@@ -205,12 +206,12 @@ namespace XML_Editor
                     Compressing comp = new Compressing(filePath, destFileName);
                     comp.decoding();
                     reader.Close();
-                    show_output(destFileName);
+                    show_output(destFileName, true);
                 }
             }
         }
 
-        private void show_output(string destFileName)
+        private void show_output(string destFileName, bool show)
         {
             //remove any text writen before in output textbox
             output_text.Text = null;
@@ -221,7 +222,8 @@ namespace XML_Editor
                 output_text.Text = fileContent;
                 reader.Close();
             }
-            success_msg.Visibility = Visibility.Visible;
+
+            if(show) success_msg.Visibility = Visibility.Visible;
         }
 
         private bool vaildate_clicking()
