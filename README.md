@@ -14,7 +14,7 @@ The project is an XML Editor that is used for doing different operations on XML 
 
 ## Contribution
 
-<img src="https://github.com/Heba-Atef99/Hospital_Management_System/blob/main/images/contribution.PNG" width="325" height="56" margin-bottom="40">
+<img src="https://github.com/Heba-Atef99/XML_Editor/blob/main/images/contribution.PNG" width="325" height="56" margin-bottom="40">
 
 ## Table of Contents
 1. [Background](#Background)
