@@ -32,13 +32,13 @@ Also, user can format XML file, minify it, convert it into JSON file, compress i
 ASP.NET Core C# (WPF Application)
 
 ## Features
-* [Browsing-XML-Files](#Browsing-XML-Files)
-* [Error-Detecting-&-Correcting](#Error-Detecting-&-Correcting)
+* [Browsing XML Files](#Browsing-XML-Files)
+* [Error Detecting & Correcting](#Error-Detecting-&-Correcting)
 * [Formatting](#Formatting)
 * [Minifying](#Minifying)
-* [Converting-XML-File-to-JSON-File](#Converting-XML-File-to-JSON-File)
-* [Compressing-XML/JSON-File](#Compressing-XML/JSON-File)
-* [Decompressing-XML/JSON-File](#Decompressing-XML/JSON-File)
+* [Converting XML File to JSON File](#Converting-XML-File-to-JSON-File)
+* [Compressing XML/JSON File](#Compressing-XML/JSON-File)
+* [Decompressing XML/JSON File](#Decompressing-XML/JSON-File)
 
 #### Browsing XML Files
 #### Error Detecting & Correcting
