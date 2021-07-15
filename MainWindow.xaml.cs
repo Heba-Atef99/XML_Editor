@@ -24,6 +24,7 @@ namespace XML_Editor
         string inputFileName = null;
         string c_file = null;
         string last_output = null;
+        int error_num = 0;
 
         public MainWindow()
         {
@@ -32,7 +33,7 @@ namespace XML_Editor
 
         ~MainWindow()
         {
-            if (File.Exists(c_file))
+            if (File.Exists(c_file) && error_num == 0)
             {
                 // If file found, delete it    
                 File.Delete(c_file);
@@ -64,7 +65,6 @@ namespace XML_Editor
 
                 //Read the contents of the file into a stream
                 var fileStream = input_file.OpenFile();
-                int error_num = 0;
                 using (StreamReader reader = new StreamReader(fileStream))
                 {
                     var fileContent = reader.ReadToEnd();
@@ -75,7 +75,8 @@ namespace XML_Editor
                     reader.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
 
                     //call consistency 
-                    c_file = "consistent_file.txt";
+                    //c_file = "consistent_file.txt";
+                    c_file = System.IO.Path.Combine(sourceDirectory, inputFileName + "_Consistent_Output.xml");
                     last_output = c_file;
                     Consistency operation = new Consistency(c_file, 0);
                     error_num = operation.Consistent(reader);
