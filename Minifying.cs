@@ -71,7 +71,7 @@ namespace XML_Editor
         public void Minify(Node root)
         {
             string s = MinifyingAUX(root);
-            File.WriteAllText(filename, s);
+            File.WriteAllText(filename, s);// for output file
         }
 
     }
