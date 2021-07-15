@@ -54,10 +54,10 @@ namespace XML_Editor
 
             if (r != null)
             {
-
+                     // loop to each child in the node 
                 foreach (Node child in children)
                 {
-                    xml += MinifyingAUX(child);
+                    xml += MinifyingAUX(child);//call function for each node 
                 }
             }
             if (!(r.getIsClosingTag()))
