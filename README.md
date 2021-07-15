@@ -12,12 +12,11 @@
 The project is an XML Editor that is used for doing different operations on XML files.
 </div>  
 
-## Contribution
-
-<img src="https://github.com/Heba-Atef99/XML_Editor/blob/main/images/contribution.PNG" width="325" height="56" margin-bottom="40">
 
 ## Table of Contents
 1. [Background](#Background)
+2. [Technologies](#Technologies)
+3. [Features](#Features)
 
 ## Background
 
@@ -28,3 +27,23 @@ with number of errors in input file, creates a new consistent file in the same p
 file ,and views a successful message indicating that the process was successful.
 Also, user can format XML file, minify it, convert it into JSON file, compress it to reduce its size
 ,and able to decompress it.
+
+## Technologies
+ASP.NET Core C# (WPF Application)
+
+## Features
+* [Browsing-XML-Files](#Browsing-XML-Files)
+* [Error-Detecting-&-Correcting](#Error-Detecting-&-Correcting)
+* [Formatting](#Formatting)
+* [Minifying](#Minifying)
+* [Converting-XML-File-to-JSON-File](#Converting-XML-File-to-JSON-File)
+* [Compressing-XML/JSON-File](#Compressing-XML/JSON-File)
+* [Decompressing-XML/JSON-File](#Decompressing-XML/JSON-File)
+
+#### Browsing XML Files
+#### Error Detecting & Correcting
+#### Formatting
+#### Minifying
+#### Converting XML File to JSON File
+#### Compressing XML/JSON File
+#### Decompressing XML/JSON File
