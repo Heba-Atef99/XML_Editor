@@ -1,6 +1,26 @@
- public static string Minifying(Node root)
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace XML_Editor
+{
+    class Minifying
+    {
+        public int first;
+        public string filename;
+
+        public Minifying(string fname, int first)
         {
-            string xml = "";
+            filename = fname;
+            this.first = first;
+        }
+
+        public string MinifyingAUX(Node root)
+        {
+            string xml = ""; //used to save data and will be return from this function 
             Node r = root;
             List<Node> children = new List<Node>();
             children = root.getChildren();
@@ -25,8 +45,7 @@
                 }
             }
 
-            if (!(r.getTagValue() == null)) 
-            
+            if (r.getTagValue() != null)
             {
                 string newStr = r.getTagValue().Trim();
 
@@ -38,12 +57,22 @@
 
                 foreach (Node child in children)
                 {
-                    xml += Minifying(child);
+                    xml += MinifyingAUX(child);
                 }
             }
             if (!(r.getIsClosingTag()))
-           
-            { 
-            xml += "</" + r.getTagName() + ">"; }
+            {
+                xml += "</" + r.getTagName() + ">";
+            }
             return xml;
-        } 
+
+        }
+
+        public void Minify(Node root)
+        {
+            string s = MinifyingAUX(root);
+            File.WriteAllText(filename, s);
+        }
+
+    }
+}
